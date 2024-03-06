@@ -7,17 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type PublicStatus int
 
-const (
-    Pending PublicStatus = iota
-	Accepted
-	Rejected
-)
-
-type PublicKeyPointRequest struct {
+type PublicFacilityRequest struct {
 	Id    uuid.UUID 
-	KeyPointId int64
+	FacilityId int64
 	AuthorId int64
 	Status PublicStatus
 	Comment string
@@ -25,7 +18,7 @@ type PublicKeyPointRequest struct {
 	AuthorName string
 }
 
-func (request *PublicKeyPointRequest) BeforeCreate(scope *gorm.DB) error {
+func (request *PublicFacilityRequest) BeforeCreate(scope *gorm.DB) error {
 	request.Id = uuid.New()
 	return nil
 }

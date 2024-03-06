@@ -1,10 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"fmt"
-	"time"
 )
 
 type Review struct {
@@ -15,7 +15,7 @@ type Review struct {
 	TourVisitDate time.Time //?
 	CommentDate time.Time //?
 	TourId int64
-	Images []string
+	Images []string `gorm:"type:text[]"`
 }
 
 func (review *Review) BeforeCreate(scope *gorm.DB) error {

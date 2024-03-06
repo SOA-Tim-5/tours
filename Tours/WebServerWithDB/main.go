@@ -1,20 +1,20 @@
 package main
 
 import (
-    "database-example/handler"
-    "database-example/model"
-    "database-example/repo"
-    "database-example/service"
-    "log"
-    "net/http"
+	"database-example/handler"
+	"database-example/model"
+	"database-example/repo"
+	"database-example/service"
+	"log"
+	"net/http"
 
-    "gorm.io/driver/postgres"
+	"gorm.io/driver/postgres"
 
-    "github.com/gorilla/mux"
-    "gorm.io/gorm"
+	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
-func initDB() gorm.DB {
+func initDB() *gorm.DB {
     dsn := "user=postgres password=super dbname=explorer-v1 host=localhost port=5432 sslmode=disable search_path=tours"
     database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
@@ -23,9 +23,13 @@ func initDB() gorm.DB {
         return nil
     }
 
-    err = database.AutoMigrate(&model.Equipment{}, &model.Facility{}, &model.KeyPoint{},
+    
+    err = database.AutoMigrate(&model.Equipment{}, &model.Facility{}, &model.KeyPointSecret{}, &model.TourDuration{},
+         &model.KeyPoint{},
         &model.PublicKeyPoint{}, &model.PublicKeyPointNotification{}, &model.PublicKeyPointRequest{},
-		&model.Review{}, &model.Tour{})
+		&model.Review{}, &model.Tour{}, &model.Campaign{}, &model.Coordinate{},
+         &model.Preference{}, &model.PublicFacilityNotification{}, &model.PublicFacilityRequest{}, &model.Subscriber{},
+&model.TourExecutionSession{}, &model.TouristEquipment{}, &model.TouristPosition{})
     if err != nil {
         log.Fatalf("Error migrating models: %v", err)
     }
@@ -33,10 +37,10 @@ func initDB() gorm.DB {
     return database
 }
 
-func startTourServer(handlerhandler.TourHandler) {
+func startTourServer(handler *handler.TourHandler) {
     router := mux.NewRouter().StrictSlash(true)
 
-    router.HandleFunc("/tour/misc", handler.CreateMiscEncounter).Methods("POST")
+    router.HandleFunc("/tour/create", handler.Create).Methods("POST")
 
     println("Server starting")
     log.Fatal(http.ListenAndServe(":88", router))

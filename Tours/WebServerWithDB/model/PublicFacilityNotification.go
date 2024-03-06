@@ -9,7 +9,7 @@ import (
 
 
 
-type PublicKeyPointNotification struct {
+type PublicFacilityNotification struct {
 	Id    uuid.UUID 
 	RequestId int64
 	Description string
@@ -23,7 +23,7 @@ type PublicKeyPointNotification struct {
 	Header string
 }
 
-func (notification *PublicKeyPointNotification) BeforeCreate(scope *gorm.DB) error {
+func (notification *PublicFacilityNotification) BeforeCreate(scope *gorm.DB) error {
 	notification.Id = uuid.New()
 	return nil
 }

@@ -4,10 +4,7 @@ import (
 	"database-example/model"
 	"database-example/service"
 	"encoding/json"
-	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 type TourHandler struct {

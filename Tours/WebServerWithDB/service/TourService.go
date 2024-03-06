@@ -3,7 +3,6 @@ package service
 import (
 	"database-example/model"
 	"database-example/repo"
-	"fmt"
 )
 
 type TourService struct {

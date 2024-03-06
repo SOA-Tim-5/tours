@@ -30,7 +30,7 @@ type Facility struct {
 	Name string
 	Description string
 	ImagePath string
-	Tags []string
+	Tags []string `gorm:"type:text[]"`
 	AuthorId int
 	Category FacilityCategory
 	Longitude float64
