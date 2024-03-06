@@ -38,7 +38,7 @@ type Facility struct {
 
 }
 
-func (keyPoint *KeyPoint) BeforeCreate(scope *gorm.DB) error {
-	keyPoint.Id = uuid.New()
+func (facility *Facility) BeforeCreate(scope *gorm.DB) error {
+	facility.Id = uuid.New()
 	return nil
 }

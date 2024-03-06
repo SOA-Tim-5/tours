@@ -49,7 +49,7 @@ type Tour struct {
 
 }
 
-func (keyPoint *KeyPoint) BeforeCreate(scope *gorm.DB) error {
-	keyPoint.Id = uuid.New()
+func (tour *Tour) BeforeCreate(scope *gorm.DB) error {
+	tour.Id = uuid.New()
 	return nil
 }
