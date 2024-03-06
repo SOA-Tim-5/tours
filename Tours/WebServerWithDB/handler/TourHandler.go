@@ -26,6 +26,7 @@ func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 
 func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	var tour model.Tour
+	//println(tour.Tags[0], tour.Tags[1])
 	err := json.NewDecoder(req.Body).Decode(&tour)
 	if err != nil {
 		println("Error while parsing json")

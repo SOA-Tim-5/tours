@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -51,6 +53,9 @@ type Tour struct {
 
 func (tour *Tour) BeforeCreate(scope *gorm.DB) error {
 	tour.Id = uuid.New()
+	if len(tour.Tags) > 0 {
+        tour.Tags = []string{fmt.Sprintf("{%s}", strings.Join(tour.Tags, ","))}
+    }
 
 	return nil
 }
