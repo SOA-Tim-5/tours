@@ -1,52 +1,55 @@
 package main
 
 import (
-	"database-example/handler"
-	"database-example/model"
-	"database-example/repo"
-	"database-example/service"
-	"log"
-	"net/http"
+    "database-example/handler"
+    "database-example/model"
+    "database-example/repo"
+    "database-example/service"
+    "log"
+    "net/http"
 
-	"github.com/gorilla/mux"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+    "gorm.io/driver/postgres"
+
+    "github.com/gorilla/mux"
+    "gorm.io/gorm"
 )
 
-func initDB() *gorm.DB {
-	connectionStr := "user=postgres password=super dbname=explorer-v1 host=localhost port=5432 sslmode=disable search_path=tours"
+func initDB() gorm.DB {
+    dsn := "user=postgres password=super dbname=explorer-v1 host=localhost port=5432 sslmode=disable search_path=tours"
+    database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	database, err := gorm.Open(mysql.Open(connectionStr), &gorm.Config{})
-	if err != nil {
-		print(err)
-		return nil
-	}
+    if err != nil {
+        print(err)
+        return nil
+    }
 
-	database.AutoMigrate(&model.Student{})
-	database.Exec("INSERT IGNORE INTO students VALUES ('aec7e123-233d-4a09-a289-75308ea5b7e6', 'Marko Markovic', 'Graficki dizajn')")
-	return database
+    err = database.AutoMigrate(&model.Equipment{}, &model.Facility{}, &model.KeyPoint{},
+        &model.PublicKeyPoint{}, &model.PublicKeyPointNotification{}, &model.PublicKeyPointRequest{},
+		&model.Review{}, &model.Tour{})
+    if err != nil {
+        log.Fatalf("Error migrating models: %v", err)
+    }
+
+    return database
 }
 
-func startServer(handler *handler.StudentHandler) {
-	router := mux.NewRouter().StrictSlash(true)
+func startTourServer(handlerhandler.TourHandler) {
+    router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/students/{id}", handler.Get).Methods("GET")
-	router.HandleFunc("/students", handler.Create).Methods("POST")
+    router.HandleFunc("/tour/misc", handler.CreateMiscEncounter).Methods("POST")
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
-	println("Server starting")
-	log.Fatal(http.ListenAndServe(":8088", router))
+    println("Server starting")
+    log.Fatal(http.ListenAndServe(":88", router))
 }
 
 func main() {
-	database := initDB()
-	if database == nil {
-		print("FAILED TO CONNECT TO DB")
-		return
-	}
-	repo := &repo.StudentRepository{DatabaseConnection: database}
-	service := &service.StudentService{StudentRepo: repo}
-	handler := &handler.StudentHandler{StudentService: service}
-
-	startServer(handler)
+    database := initDB()
+    if database == nil {
+        print("FAILED TO CONNECT TO DB")
+        return
+    }
+    tourRepo := &repo.TourRepository{DatabaseConnection: database}
+    tourService := &service.TourService{TourRepo: tourRepo}
+    tourHandler := &handler.TourHandler{TourService: tourService}
+    startTourServer(tourHandler)
 }

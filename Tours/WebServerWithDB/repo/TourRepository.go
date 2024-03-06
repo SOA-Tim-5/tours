@@ -6,21 +6,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type StudentRepository struct {
+type TourRepository struct {
 	DatabaseConnection *gorm.DB
 }
 
-func (repo *StudentRepository) FindById(id string) (model.Student, error) {
+/*func (repo *StudentRepository) FindById(id string) (model.Student, error) {
 	student := model.Student{}
 	dbResult := repo.DatabaseConnection.First(&student, "id = ?", id)
 	if dbResult != nil {
 		return student, dbResult.Error
 	}
 	return student, nil
-}
+}*/
 
-func (repo *StudentRepository) CreateStudent(student *model.Student) error {
-	dbResult := repo.DatabaseConnection.Create(student)
+func (repo *TourRepository) CreateTour(tour *model.Tour) error {
+	dbResult := repo.DatabaseConnection.Create(tour)
 	if dbResult.Error != nil {
 		return dbResult.Error
 	}

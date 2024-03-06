@@ -6,20 +6,20 @@ import (
 	"fmt"
 )
 
-type StudentService struct {
-	StudentRepo *repo.StudentRepository
+type TourService struct {
+	TourRepo *repo.TourRepository
 }
 
-func (service *StudentService) FindStudent(id string) (*model.Student, error) {
+/*func (service *TourService) FindStudent(id string) (*model.Student, error) {
 	student, err := service.StudentRepo.FindById(id)
 	if err != nil {
 		return nil, fmt.Errorf(fmt.Sprintf("menu item with id %s not found", id))
 	}
 	return &student, nil
-}
+}*/
 
-func (service *StudentService) Create(student *model.Student) error {
-	err := service.StudentRepo.CreateStudent(student)
+func (service *TourService) Create(tour *model.Tour) error {
+	err := service.TourRepo.CreateTour(tour)
 	if err != nil {
 		return err
 	}

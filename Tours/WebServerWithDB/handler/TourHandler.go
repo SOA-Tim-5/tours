@@ -10,11 +10,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type StudentHandler struct {
-	StudentService *service.StudentService
+type TourHandler struct {
+	TourService *service.TourService
 }
-
-func (handler *StudentHandler) Get(writer http.ResponseWriter, req *http.Request) {
+/*
+func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	id := mux.Vars(req)["id"]
 	log.Printf("Student sa id-em %s", id)
 	// student, err := handler.StudentService.FindStudent(id)
@@ -25,19 +25,19 @@ func (handler *StudentHandler) Get(writer http.ResponseWriter, req *http.Request
 	// }
 	writer.WriteHeader(http.StatusOK)
 	// json.NewEncoder(writer).Encode(student)
-}
+}*/
 
-func (handler *StudentHandler) Create(writer http.ResponseWriter, req *http.Request) {
-	var student model.Student
-	err := json.NewDecoder(req.Body).Decode(&student)
+func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request) {
+	var tour model.Tour
+	err := json.NewDecoder(req.Body).Decode(&tour)
 	if err != nil {
 		println("Error while parsing json")
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = handler.StudentService.Create(&student)
+	err = handler.TourService.Create(&tour)
 	if err != nil {
-		println("Error while creating a new student")
+		println("Error while creating a new tour")
 		writer.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
