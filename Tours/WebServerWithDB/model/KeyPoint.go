@@ -1,12 +1,14 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type KeyPoint struct {
-	Id    uuid.UUID 
+	Id    int64 
 	TourId  int64    
 	Tour Tour //?
 	Name string
@@ -23,6 +25,8 @@ type KeyPoint struct {
 }
 
 func (keyPoint *KeyPoint) BeforeCreate(scope *gorm.DB) error {
-	keyPoint.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    keyPoint.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

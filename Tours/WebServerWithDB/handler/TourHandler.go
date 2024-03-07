@@ -5,6 +5,9 @@ import (
 	"database-example/service"
 	"encoding/json"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type TourHandler struct {
@@ -42,3 +45,26 @@ func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
 }
+
+func (handler *TourHandler) GetByAuthorId(writer http.ResponseWriter, req *http.Request) {
+	authorIdStr := mux.Vars(req)["authorId"]
+	authorId, err := strconv.ParseInt(authorIdStr, 10, 64)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	storedTours, err := handler.TourService.GetByAuthorId(authorId)
+	writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	err = json.NewEncoder(writer).Encode(storedTours)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+

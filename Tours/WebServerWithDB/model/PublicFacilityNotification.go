@@ -10,7 +10,7 @@ import (
 
 
 type PublicFacilityNotification struct {
-	Id    uuid.UUID 
+	Id    int64
 	RequestId int64
 	Description string
 	AuthorId int64
@@ -24,6 +24,8 @@ type PublicFacilityNotification struct {
 }
 
 func (notification *PublicFacilityNotification) BeforeCreate(scope *gorm.DB) error {
-	notification.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    notification.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

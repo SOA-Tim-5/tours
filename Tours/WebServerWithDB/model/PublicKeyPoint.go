@@ -1,12 +1,14 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type PublicKeyPoint struct {
-	Id    uuid.UUID 
+	Id    int64
 	Name string
 	Description string
 	Longitude float64
@@ -17,6 +19,8 @@ type PublicKeyPoint struct {
 }
 
 func (keyPoint *PublicKeyPoint) BeforeCreate(scope *gorm.DB) error {
-	keyPoint.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    keyPoint.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

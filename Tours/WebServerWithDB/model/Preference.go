@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -8,7 +10,7 @@ import (
 
 
 type Preference struct {
-	Id    uuid.UUID  
+	Id    int64
 	UserId int64
 	DifficultyLevel int
 	WalkingRating int
@@ -22,6 +24,8 @@ type Preference struct {
 }
 
 func (preference *Preference) BeforeCreate(scope *gorm.DB) error {
-	preference.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    preference.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

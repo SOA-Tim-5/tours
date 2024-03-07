@@ -9,7 +9,7 @@ import (
 
 
 type PublicFacilityRequest struct {
-	Id    uuid.UUID 
+	Id    int64
 	FacilityId int64
 	AuthorId int64
 	Status PublicStatus
@@ -19,6 +19,8 @@ type PublicFacilityRequest struct {
 }
 
 func (request *PublicFacilityRequest) BeforeCreate(scope *gorm.DB) error {
-	request.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    request.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

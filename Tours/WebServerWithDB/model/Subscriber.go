@@ -8,7 +8,7 @@ import (
 )
 
 type Subscriber struct {
-	Id    uuid.UUID 
+	Id    int64
 	TouristId  int64    
 	EmailAddress string
 	Frequency int
@@ -18,7 +18,9 @@ type Subscriber struct {
 }
 
 func (subscriber *Subscriber) BeforeCreate(scope *gorm.DB) error {
-	subscriber.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    subscriber.Id = currentTimestamp + int64(uniqueID)
 
 	return nil
 }

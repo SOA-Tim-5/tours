@@ -18,7 +18,7 @@ const (
 
 
 type TourExecutionSession struct {
-	Id    uuid.UUID 
+	Id    int64
 	Status TourExecutionSessionStatus
 	TourId  int64 
 	TouristId  int64 
@@ -31,7 +31,9 @@ type TourExecutionSession struct {
 }
 
 func (tourExecutionSession *TourExecutionSession) BeforeCreate(scope *gorm.DB) error {
-	tourExecutionSession.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    tourExecutionSession.Id = currentTimestamp + int64(uniqueID)
 
 	return nil
 }

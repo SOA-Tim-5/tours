@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -24,7 +25,7 @@ const (
 )
 
 type Facility struct {
-	Id          uuid.UUID
+	Id          int64
 	Name        string
 	Description string
 	ImagePath   string
@@ -36,7 +37,9 @@ type Facility struct {
 }
 
 func (facility *Facility) BeforeCreate(scope *gorm.DB) error {
-	facility.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    facility.Id = currentTimestamp + int64(uniqueID)
 	if len(facility.Tags) > 0 {
 		facility.Tags = []string{fmt.Sprintf("{%s}", strings.Join(facility.Tags, ","))}
 	}

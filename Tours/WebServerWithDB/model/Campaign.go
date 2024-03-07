@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -9,7 +11,7 @@ import (
 
 
 type Campaign struct {
-	Id    uuid.UUID 
+	Id    int64 
 	TouristId  int64    
 	Name string
 	Description string
@@ -25,7 +27,8 @@ type Campaign struct {
 }
 
 func (campaign *Campaign) BeforeCreate(scope *gorm.DB) error {
-	campaign.Id = uuid.New()
-
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    campaign.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

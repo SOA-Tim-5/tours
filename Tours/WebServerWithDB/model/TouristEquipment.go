@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -9,7 +11,7 @@ import (
 
 
 type TouristEquipment struct {
-	Id    uuid.UUID 
+	Id    int64 
 	TouristId  int64 
 	EquipmentIds []int `gorm:"type:int[]"`
 	
@@ -18,7 +20,9 @@ type TouristEquipment struct {
 }
 
 func (touristEquipment *TouristEquipment) BeforeCreate(scope *gorm.DB) error {
-	touristEquipment.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    touristEquipment.Id = currentTimestamp + int64(uniqueID)
 
 	return nil
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Review struct {
-	Id    uuid.UUID 
+	Id    int64
 	Rating  int   
 	Comment string
 	TouristId int64
@@ -19,6 +19,8 @@ type Review struct {
 }
 
 func (review *Review) BeforeCreate(scope *gorm.DB) error {
-	review.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    review.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

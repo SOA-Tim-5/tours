@@ -3,6 +3,7 @@ package service
 import (
 	"database-example/model"
 	"database-example/repo"
+	"fmt"
 )
 
 type TourService struct {
@@ -23,4 +24,11 @@ func (service *TourService) Create(tour *model.Tour) error {
 		return err
 	}
 	return nil
+}
+func (service *TourService) GetByAuthorId(authorId int64) ([]model.Tour, error) {
+	storedTours, err := service.TourRepo.GetByAuthorId(authorId)
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("tours with authorId %d not found", authorId))
+	}
+	return storedTours, nil
 }

@@ -1,11 +1,10 @@
 package model
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -31,12 +30,12 @@ const (
 
 
 type Tour struct {
-	Id    uuid.UUID 
+	Id    int64 
 	AuthorId  int64    
 	Name string
 	Description string
 	Difficulty int
-	Tags []string `gorm:"type:text[]"`
+	Tags pq.StringArray `gorm:"type:text[]"`
 	Status TourStatus
 	Price float64
 	IsDeleted bool
@@ -52,10 +51,14 @@ type Tour struct {
 }
 
 func (tour *Tour) BeforeCreate(scope *gorm.DB) error {
-	tour.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    tour.Id = currentTimestamp + int64(uniqueID)
+	//tour.KeyPoints = make([]KeyPoint, 0)
 	if len(tour.Tags) > 0 {
-        tour.Tags = []string{fmt.Sprintf("{%s}", strings.Join(tour.Tags, ","))}
+        //tour.Tags = []string{fmt.Sprintf("{%s}", strings.Join(tour.Tags, ","))}
     }
-
-	return nil
+    return nil
+	
+	
 }

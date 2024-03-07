@@ -16,7 +16,7 @@ const (
 )
 
 type PublicKeyPointRequest struct {
-	Id    uuid.UUID 
+	Id    int64
 	KeyPointId int64
 	AuthorId int64
 	Status PublicStatus
@@ -26,6 +26,8 @@ type PublicKeyPointRequest struct {
 }
 
 func (request *PublicKeyPointRequest) BeforeCreate(scope *gorm.DB) error {
-	request.Id = uuid.New()
+	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
+    uniqueID := uuid.New().ID()
+    request.Id = currentTimestamp + int64(uniqueID)
 	return nil
 }

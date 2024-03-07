@@ -39,10 +39,14 @@ func initDB() *gorm.DB {
 func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyPointHandler, facilityHandler *handler.FacilityHandler, equipmentHandler *handler.EquipmentHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
+	//POST
 	router.HandleFunc("/tour/create", handler.Create).Methods("POST")
 	router.HandleFunc("/keypoint/create", keyPointHandler.Create).Methods("POST")
 	router.HandleFunc("/facility/create", facilityHandler.Create).Methods("POST")
 	router.HandleFunc("/equipment/create", equipmentHandler.Create).Methods("POST")
+
+	//GET
+	router.HandleFunc("/tours/get/{authorId}", handler.GetByAuthorId).Methods("GET")
 
 	println("Server starting")
 	log.Fatal(http.ListenAndServe(":88", router))
