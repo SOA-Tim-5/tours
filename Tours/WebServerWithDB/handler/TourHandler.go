@@ -13,6 +13,7 @@ import (
 type TourHandler struct {
 	TourService *service.TourService
 }
+
 /*
 func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	id := mux.Vars(req)["id"]
@@ -67,4 +68,3 @@ func (handler *TourHandler) GetByAuthorId(writer http.ResponseWriter, req *http.
 		return
 	}
 }
-
