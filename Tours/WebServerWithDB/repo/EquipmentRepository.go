@@ -27,3 +27,13 @@ func (repo *EquipmentRepository) CreateEquipment(equipment *model.Equipment) err
 	println("Rows affected: ", dbResult.RowsAffected)
 	return nil
 }
+
+func (repo *EquipmentRepository) GetAll() ([]model.Equipment, error) {
+	var storedEquipments []model.Equipment
+	dbResult := repo.DatabaseConnection.Find(&storedEquipments)
+	if dbResult.Error != nil {
+		return nil, dbResult.Error
+	}
+
+	return storedEquipments, nil
+}

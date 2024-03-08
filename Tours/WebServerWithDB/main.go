@@ -50,6 +50,7 @@ func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyP
 	router.HandleFunc("/tours/getTour/{tourId}", handler.GetById).Methods("GET")
 	router.HandleFunc("/tours/getKeypoints/{tourId}", keyPointHandler.GetKeyPoints).Methods("GET")
 	router.HandleFunc("/facility/get/{authorId}", facilityHandler.GetByAuthorId).Methods("GET")
+	router.HandleFunc("/equipment/get/", equipmentHandler.GetAll).Methods("GET")
 
 	println("Server starting")
 	log.Fatal(http.ListenAndServe(":88", router))
@@ -69,8 +70,6 @@ func main() {
 	tourRepo := &repo.TourRepository{DatabaseConnection: database}
 	tourService := &service.TourService{TourRepo: tourRepo, KeypointRepo: keyPointRepo}
 	tourHandler := &handler.TourHandler{TourService: tourService}
-
-	
 
 	facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
 	facilityService := &service.FacilityService{FacilityRepo: facilityRepo}

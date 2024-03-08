@@ -42,4 +42,21 @@ func (handler *EquipmentHandler) Create(writer http.ResponseWriter, req *http.Re
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(writer).Encode(equipment)
+}
+func (handler *EquipmentHandler) GetAll(writer http.ResponseWriter, req *http.Request) {
+
+	storedFacilites, err := handler.EquipmentService.GetAll()
+	writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	err = json.NewEncoder(writer).Encode(storedFacilites)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"database-example/model"
 	"database-example/repo"
+	"fmt"
 )
 
 type EquipmentService struct {
@@ -23,4 +24,11 @@ func (service *EquipmentService) Create(equipment *model.Equipment) error {
 		return err
 	}
 	return nil
+}
+func (service *EquipmentService) GetAll() ([]model.Equipment, error) {
+	storedEquipments, err := service.EquipmentRepo.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("tours with authorId not found"))
+	}
+	return storedEquipments, nil
 }
