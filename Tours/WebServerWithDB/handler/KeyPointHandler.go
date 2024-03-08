@@ -45,6 +45,8 @@ func (handler *KeyPointHandler) Create(writer http.ResponseWriter, req *http.Req
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(keyPoint)
+
 }
 func (handler *KeyPointHandler) GetKeyPoints(writer http.ResponseWriter, req *http.Request) {
 	tourIdStr := mux.Vars(req)["tourId"]
@@ -66,4 +68,5 @@ func (handler *KeyPointHandler) GetKeyPoints(writer http.ResponseWriter, req *ht
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	println("usaoo")
 }

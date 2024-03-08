@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -37,11 +38,24 @@ type Facility struct {
 }
 
 func (facility *Facility) BeforeCreate(scope *gorm.DB) error {
+
+
+	if err := facility.Validate(); err != nil {
+        return err
+    }
+
 	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
     uniqueID := uuid.New().ID()
     facility.Id = currentTimestamp + int64(uniqueID)
 	if len(facility.Tags) > 0 {
 		facility.Tags = []string{fmt.Sprintf("{%s}", strings.Join(facility.Tags, ","))}
+	}
+	return nil
+}
+
+func (facility *Facility) Validate() error {
+	if facility.Name == "" {
+		return errors.New("invalid Name")
 	}
 	return nil
 }

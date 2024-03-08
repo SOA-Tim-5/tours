@@ -45,6 +45,7 @@ func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(tour)
 }
 
 func (handler *TourHandler) GetByAuthorId(writer http.ResponseWriter, req *http.Request) {

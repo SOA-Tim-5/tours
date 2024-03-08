@@ -31,5 +31,6 @@ func (service *KeyPointService) GetKeyPoints(tourId int64) ([]model.KeyPoint, er
 	if err != nil {
 		return nil, fmt.Errorf(fmt.Sprintf("tours with authorId %d not found", tourId))
 	}
+	println("usaoo")
 	return storedKeyPoints, nil
 }

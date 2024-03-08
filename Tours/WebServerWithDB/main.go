@@ -61,13 +61,16 @@ func main() {
 		print("FAILED TO CONNECT TO DB")
 		return
 	}
-	tourRepo := &repo.TourRepository{DatabaseConnection: database}
-	tourService := &service.TourService{TourRepo: tourRepo}
-	tourHandler := &handler.TourHandler{TourService: tourService}
 
 	keyPointRepo := &repo.KeyPointRepository{DatabaseConnection: database}
 	keyPointService := &service.KeyPointService{KeyPointRepo: keyPointRepo}
 	keyPointHandler := &handler.KeyPointHandler{KeyPointService: keyPointService}
+
+	tourRepo := &repo.TourRepository{DatabaseConnection: database}
+	tourService := &service.TourService{TourRepo: tourRepo, KeypointRepo: keyPointRepo}
+	tourHandler := &handler.TourHandler{TourService: tourService}
+
+	
 
 	facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
 	facilityService := &service.FacilityService{FacilityRepo: facilityRepo}
