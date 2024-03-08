@@ -54,6 +54,7 @@ func (tour *Tour) BeforeCreate(scope *gorm.DB) error {
 	if len(tour.Tags) > 0 {
 		//tour.Tags = []string{fmt.Sprintf("{%s}", strings.Join(tour.Tags, ","))}
 	}
+	//println("okoko")
 	return nil
 
 }

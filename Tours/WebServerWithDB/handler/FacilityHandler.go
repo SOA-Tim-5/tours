@@ -45,6 +45,7 @@ func (handler *FacilityHandler) Create(writer http.ResponseWriter, req *http.Req
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(facility)
 }
 
 func (handler *FacilityHandler) GetByAuthorId(writer http.ResponseWriter, req *http.Request) {
