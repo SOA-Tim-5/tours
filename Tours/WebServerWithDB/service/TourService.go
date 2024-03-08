@@ -32,3 +32,10 @@ func (service *TourService) GetByAuthorId(authorId int64) ([]model.Tour, error) 
 	}
 	return storedTours, nil
 }
+func (service *TourService) GetById(id int64) (*model.Tour, error) {
+	tour, err := service.TourRepo.GetById(id)
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("menu item with id %s not found", id))
+	}
+	return &tour, nil
+}

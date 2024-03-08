@@ -3,6 +3,7 @@ package service
 import (
 	"database-example/model"
 	"database-example/repo"
+	"fmt"
 )
 
 type KeyPointService struct {
@@ -23,4 +24,12 @@ func (service *KeyPointService) Create(keyPoint *model.KeyPoint) error {
 		return err
 	}
 	return nil
+}
+
+func (service *KeyPointService) GetKeyPoints(tourId int64) ([]model.KeyPoint, error) {
+	storedKeyPoints, err := service.KeyPointRepo.GetKeyPoints(tourId)
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("tours with authorId %d not found", tourId))
+	}
+	return storedKeyPoints, nil
 }

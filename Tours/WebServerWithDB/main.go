@@ -47,6 +47,9 @@ func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyP
 
 	//GET
 	router.HandleFunc("/tours/get/{authorId}", handler.GetByAuthorId).Methods("GET")
+	router.HandleFunc("/tours/getTour/{tourId}", handler.GetById).Methods("GET")
+	router.HandleFunc("/tours/getKeypoints/{tourId}", keyPointHandler.GetKeyPoints).Methods("GET")
+	router.HandleFunc("/facility/get/{authorId}", facilityHandler.GetByAuthorId).Methods("GET")
 
 	println("Server starting")
 	log.Fatal(http.ListenAndServe(":88", router))

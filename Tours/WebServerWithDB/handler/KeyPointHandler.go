@@ -5,6 +5,9 @@ import (
 	"database-example/service"
 	"encoding/json"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type KeyPointHandler struct {
@@ -42,4 +45,25 @@ func (handler *KeyPointHandler) Create(writer http.ResponseWriter, req *http.Req
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
+}
+func (handler *KeyPointHandler) GetKeyPoints(writer http.ResponseWriter, req *http.Request) {
+	tourIdStr := mux.Vars(req)["tourId"]
+	tourId, err := strconv.ParseInt(tourIdStr, 10, 64)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	storedKeyPoints, err := handler.KeyPointService.GetKeyPoints(tourId)
+	writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	err = json.NewEncoder(writer).Encode(storedKeyPoints)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

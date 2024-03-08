@@ -27,3 +27,13 @@ func (repo *KeyPointRepository) CreateKeyPoint(keyPoint *model.KeyPoint) error {
 	println("Rows affected: ", dbResult.RowsAffected)
 	return nil
 }
+
+func (repo *KeyPointRepository) GetKeyPoints(tourId int64) ([]model.KeyPoint, error) {
+	var storedKeyPoints []model.KeyPoint
+	dbResult := repo.DatabaseConnection.Find(&storedKeyPoints, "tour_id = ?", tourId)
+	if dbResult.Error != nil {
+		return nil, dbResult.Error
+	}
+
+	return storedKeyPoints, nil
+}

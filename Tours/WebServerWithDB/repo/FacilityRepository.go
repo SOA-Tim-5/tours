@@ -27,3 +27,13 @@ func (repo *FacilityRepository) CreateFacility(facility *model.Facility) error {
 	println("Rows affected: ", dbResult.RowsAffected)
 	return nil
 }
+
+func (repo *FacilityRepository) GetByAuthorId(authorId int64) ([]model.Facility, error) {
+	var storedFacilites []model.Facility
+	dbResult := repo.DatabaseConnection.Find(&storedFacilites, "author_id = ?", authorId)
+	if dbResult.Error != nil {
+		return nil, dbResult.Error
+	}
+
+	return storedFacilites, nil
+}

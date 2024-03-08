@@ -56,3 +56,11 @@ func (repo *TourRepository) GetByAuthorId(authorId int64) ([]model.Tour, error) 
 
 	return storedTours, nil
 }
+func (repo *TourRepository) GetById(id int64) (model.Tour, error) {
+	tour := model.Tour{}
+	dbResult := repo.DatabaseConnection.First(&tour, "id = ?", id)
+	if dbResult != nil {
+		return tour, dbResult.Error
+	}
+	return tour, nil
+}
