@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,9 +20,18 @@ type KeyPoint struct {
 	ImagePath           string
 	Order               int64
 	HaveSecret          bool
-	Secret              KeyPointSecret `gorm:"type:jsonb;"`
+	Secret              []byte `gorm:"column:secret;type:jsonb;"`
 	IsEncounterRequired bool
 	HasEncounter        bool
+}
+
+func (kp *KeyPoint) ParseSecret() (*KeyPointSecret, error) {
+	var secret KeyPointSecret
+	err := json.Unmarshal(kp.Secret, &secret)
+	if err != nil {
+		return nil, err
+	}
+	return &secret, nil
 }
 
 func (keyPoint *KeyPoint) BeforeCreate(scope *gorm.DB) error {
