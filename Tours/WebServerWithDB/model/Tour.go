@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -47,14 +48,42 @@ type Tour struct {
 }
 
 func (tour *Tour) BeforeCreate(scope *gorm.DB) error {
+
+	if err := tour.Validate(); err != nil {
+        return err
+    }
+
+
 	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
 	uniqueID := uuid.New().ID()
 	tour.Id = currentTimestamp + int64(uniqueID)
 	//tour.KeyPoints = make([]KeyPoint, 0)
-	if len(tour.Tags) > 0 {
+	/*if len(tour.Tags) > 0 {
 		//tour.Tags = []string{fmt.Sprintf("{%s}", strings.Join(tour.Tags, ","))}
-	}
+	}*/
 	//println("okoko")
 	return nil
 
 }
+
+
+func (tour *Tour) Validate() error {
+    if tour.Name == "" {
+        return errors.New("invalid name")
+    }
+    if tour.Description == "" {
+        return errors.New("invalid description")
+    }
+    if tour.Difficulty < 1 || tour.Difficulty > 5 {
+        return errors.New("invalid difficulty")
+    }
+    //if len(tour.Tags) == 0 {
+    //    return errors.New("Tags cannot be empty")
+    //}
+    if tour.Price < 0 {
+        return errors.New("price cannot be negative")
+    }
+    return nil
+}
+
+

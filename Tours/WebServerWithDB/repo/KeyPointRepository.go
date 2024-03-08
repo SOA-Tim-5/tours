@@ -34,7 +34,6 @@ func (repo *KeyPointRepository) GetKeyPoints(tourId int64) ([]model.KeyPoint, er
 	
 	
 	if dbResult.Error != nil {
-		println("usao")
 		return nil, dbResult.Error
 	}
 

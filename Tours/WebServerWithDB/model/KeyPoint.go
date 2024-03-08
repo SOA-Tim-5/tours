@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,19 +25,32 @@ type KeyPoint struct {
 	HasEncounter        bool
 }
 
-/*func (kp *KeyPoint) ParseSecret() (*KeyPointSecret, error) {
-	var secret KeyPointSecret
-	err := json.Unmarshal(kp.Secret, &secret)
-	if err != nil {
-		return nil, err
-	}
-	return &secret, nil
-}*/
+
 
 func (keyPoint *KeyPoint) BeforeCreate(scope *gorm.DB) error {
+
+	if err := keyPoint.Validate(); err != nil {
+        return err
+    }
+
+
+
 	currentTimestamp := time.Now().UnixNano() / int64(time.Microsecond)
 	uniqueID := uuid.New().ID()
 	keyPoint.Id = currentTimestamp + int64(uniqueID)
 	println("okoko")
+	return nil
+}
+
+func (kp *KeyPoint) Validate() error {
+	if kp.Longitude < -180 || kp.Longitude > 180 {
+		return errors.New("invalid Longitude")
+	}
+	if kp.Latitude < -90 || kp.Latitude > 90 {
+		return errors.New("invalid Latitude")
+	}
+	if kp.ImagePath == "" {
+		return errors.New("invalid ImagePath")
+	}
 	return nil
 }
