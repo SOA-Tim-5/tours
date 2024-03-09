@@ -28,7 +28,7 @@ func (service *EquipmentService) Create(equipment *model.Equipment) error {
 func (service *EquipmentService) GetAll() ([]model.Equipment, error) {
 	storedEquipments, err := service.EquipmentRepo.GetAll()
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("tours with authorId not found"))
+		return nil, fmt.Errorf("not found")
 	}
 	return storedEquipments, nil
 }

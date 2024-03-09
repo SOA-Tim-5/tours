@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +18,7 @@ type Preference struct {
 	CyclingRating int
 	CarRating int
 	BoatRating int
-	SelectedTags []string `gorm:"type:text[]"`
+	SelectedTags pq.StringArray `gorm:"type:text[]"`
 
 
 

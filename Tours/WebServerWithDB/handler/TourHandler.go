@@ -72,7 +72,7 @@ func (handler *TourHandler) GetByAuthorId(writer http.ResponseWriter, req *http.
 
 func (handler *TourHandler) GetById(writer http.ResponseWriter, req *http.Request) {
 	tourIdStr := mux.Vars(req)["tourId"]
-	tourId, err := strconv.ParseInt(tourIdStr, 10, 64)
+	tourId, _ := strconv.ParseInt(tourIdStr, 10, 64)
 
 	tour, err := handler.TourService.GetById(tourId)
 	writer.Header().Set("Content-Type", "application/json")
