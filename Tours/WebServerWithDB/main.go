@@ -36,7 +36,8 @@ func initDB() *gorm.DB {
 	return database
 }
 
-func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyPointHandler, facilityHandler *handler.FacilityHandler, equipmentHandler *handler.EquipmentHandler, preferenceHandler *handler.PreferenceHandler) {
+func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyPointHandler, facilityHandler *handler.FacilityHandler, 
+	equipmentHandler *handler.EquipmentHandler, preferenceHandler *handler.PreferenceHandler, publicKeyPointRequestHandler *handler.PublicKeyPointRequestHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	//POST
@@ -45,6 +46,7 @@ func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyP
 	router.HandleFunc("/facility/create", facilityHandler.Create).Methods("POST")
 	router.HandleFunc("/equipment/create", equipmentHandler.Create).Methods("POST")
 	router.HandleFunc("/preference/create", preferenceHandler.Create).Methods("POST")
+	router.HandleFunc("/publicKeyPointRequest/create", publicKeyPointRequestHandler.Create).Methods("POST")
 
 	//GET
 	router.HandleFunc("/tours/get/{authorId}", handler.GetByAuthorId).Methods("GET")
@@ -53,6 +55,7 @@ func startTourServer(handler *handler.TourHandler, keyPointHandler *handler.KeyP
 	router.HandleFunc("/facility/get/{authorId}", facilityHandler.GetByAuthorId).Methods("GET")
 	router.HandleFunc("/equipment/get/", equipmentHandler.GetAll).Methods("GET")
 	router.HandleFunc("/preferences/get/{touristId}", preferenceHandler.GetByTouristId).Methods("GET")
+	router.HandleFunc("/publicKeyPointRequest/get/", publicKeyPointRequestHandler.GetAll).Methods("GET")
 
 	println("Server starting")
 	log.Fatal(http.ListenAndServe(":88", router))
@@ -85,7 +88,12 @@ func main() {
 	preferenceRepo := &repo.PreferenceRepository{DatabaseConnection: database}
 	preferenceService := &service.PreferenceService{PreferenceRepo: preferenceRepo}
 	preferenceHandler := &handler.PreferenceHandler{PreferenceService: preferenceService}
-	startTourServer(tourHandler, keyPointHandler, facilityHandler, equipmentHandler, preferenceHandler)
+
+	publicKeyPointRequestRepo := &repo.PublicKeyPointRequestRepository{DatabaseConnection: database}
+	publicKeyPointRequestService := &service.PublicKeyPointRequestService{PublicKeyPointRequestRepo: publicKeyPointRequestRepo, KeypointRepo: keyPointRepo}
+	publicKeyPointRequestHandler := &handler.PublicKeyPointRequestHandler{PublicKeyPointRequestService: publicKeyPointRequestService}
+
+	startTourServer(tourHandler, keyPointHandler, facilityHandler, equipmentHandler, preferenceHandler, publicKeyPointRequestHandler)
 
 
 }

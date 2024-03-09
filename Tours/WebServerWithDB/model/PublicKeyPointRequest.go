@@ -23,6 +23,7 @@ type PublicKeyPointRequest struct {
 	Comment string
 	Created time.Time
 	AuthorName string
+	AuthorPicture string
 }
 
 func (request *PublicKeyPointRequest) BeforeCreate(scope *gorm.DB) error {

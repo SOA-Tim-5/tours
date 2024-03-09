@@ -22,10 +22,18 @@ func (repo *PreferenceRepository) CreatePreference(preference *model.Preference)
 
 func (repo *PreferenceRepository) GetByTouristId(touristId int64) (model.Preference, error) {
 	var storedPreference model.Preference
-	dbResult := repo.DatabaseConnection.First(&storedPreference, "user_id = ?", touristId)
+	var storedPreferences []model.Preference
+	dbResult := repo.DatabaseConnection.Find(&storedPreferences, "user_id = ?", touristId)
+
+	if len(storedPreferences) == 0 {
+		println("anja")
+		return model.Preference{}, dbResult.Error
+	}
+
 	if dbResult.Error != nil {
 		return storedPreference, dbResult.Error
 	}
 
+	storedPreference = storedPreferences[0]
 	return storedPreference, nil
 }

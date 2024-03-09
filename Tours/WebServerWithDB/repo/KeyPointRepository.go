@@ -39,3 +39,12 @@ func (repo *KeyPointRepository) GetKeyPoints(tourId int64) ([]model.KeyPoint, er
 
 	return storedKeyPoints, nil
 }
+
+func (repo *KeyPointRepository) GetById(id int64) (model.KeyPoint, error) {
+	keyPoint := model.KeyPoint{}
+	dbResult := repo.DatabaseConnection.First(&keyPoint, "id = ?", id)
+	if dbResult != nil {
+		return keyPoint, dbResult.Error
+	}
+	return keyPoint, nil
+}
