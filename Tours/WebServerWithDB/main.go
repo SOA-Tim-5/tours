@@ -23,10 +23,10 @@ func initDB() *gorm.DB {
 		return nil
 	}
 
-	err = database.AutoMigrate(&model.Equipment{}, &model.Facility{}, &model.KeyPointSecret{}, &model.TourDuration{},
+	err = database.AutoMigrate(&model.Equipment{}, &model.Facility{}, &model.KeyPointSecret{}, &model.TourDuration{}, &model.Tour{},
 		&model.KeyPoint{},
 		&model.PublicKeyPoint{}, &model.PublicKeyPointNotification{}, &model.PublicKeyPointRequest{},
-		&model.Review{}, &model.Tour{}, &model.Campaign{}, &model.Coordinate{},
+		&model.Review{}, &model.Campaign{}, &model.Coordinate{},
 		&model.Preference{}, &model.PublicFacilityNotification{}, &model.PublicFacilityRequest{}, &model.Subscriber{},
 		&model.TourExecutionSession{}, &model.TouristEquipment{}, &model.TouristPosition{})
 	if err != nil {
