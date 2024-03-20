@@ -37,3 +37,11 @@ func (repo *FacilityRepository) GetByAuthorId(authorId int64) ([]model.Facility,
 
 	return storedFacilites, nil
 }
+func (repo *FacilityRepository) GetById(id int64) (model.Facility, error) {
+	facility := model.Facility{}
+	dbResult := repo.DatabaseConnection.First(&facility, "id = ?", id)
+	if dbResult != nil {
+		return facility, dbResult.Error
+	}
+	return facility, nil
+}
