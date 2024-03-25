@@ -15,11 +15,17 @@ import (
 )
 
 func initDB() *gorm.DB {
-	dsn := "user=postgres password=super dbname=explorer-v1 host=localhost port=5432 sslmode=disable search_path=tours"
+	dsn := "user=postgres password=super dbname=explorer host=database port=5432 sslmode=disable search_path=tours"
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		print(err)
+		return nil
+	}
+
+	database = database.Exec("create schema if not exists tours")
+	if database.Error != nil {
+		print(database.Error)
 		return nil
 	}
 
