@@ -23,12 +23,6 @@ func initDB() *gorm.DB {
 		return nil
 	}
 
-	database = database.Exec("create schema if not exists tours")
-	if database.Error != nil {
-		print(database.Error)
-		return nil
-	}
-
 	err = database.AutoMigrate(&model.Equipment{}, &model.Facility{}, &model.KeyPointSecret{}, &model.TourDuration{}, &model.Tour{},
 		&model.KeyPoint{},
 		&model.PublicKeyPoint{}, &model.PublicKeyPointNotification{}, &model.PublicKeyPointRequest{},
