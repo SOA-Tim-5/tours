@@ -1,13 +1,19 @@
 package main
 
 import (
+	"context"
 	"database-example/handler"
 	"database-example/model"
+	"database-example/proto/tour"
 	"database-example/repo"
 	"database-example/service"
 	"log"
+	"net"
 	"net/http"
+	"strconv"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/postgres"
 
 	"github.com/gorilla/mux"
@@ -15,7 +21,8 @@ import (
 )
 
 func initDB() *gorm.DB {
-	dsn := "user=postgres password=super dbname=explorer host=database port=5432 sslmode=disable search_path=tours"
+	// host database dbname explorer-v1
+	dsn := "user=postgres password=super dbname=explorer-v1 host=localhost port=5432 sslmode=disable search_path=tours"
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -71,34 +78,123 @@ func main() {
 		return
 	}
 
-	keyPointRepo := &repo.KeyPointRepository{DatabaseConnection: database}
-	keyPointService := &service.KeyPointService{KeyPointRepo: keyPointRepo}
-	keyPointHandler := &handler.KeyPointHandler{KeyPointService: keyPointService}
+	keyPointRepo := repo.KeyPointRepository{DatabaseConnection: database}
+	/*
+		tourRepo := &repo.TourRepository{DatabaseConnection: database}
+		facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
+		equipmentRepo := &repo.EquipmentRepository{DatabaseConnection: database}
+		preferenceRepo := &repo.PreferenceRepository{DatabaseConnection: database}
+		publicFacilityRequestRepo := &repo.PublicFacilityRequestRepository{DatabaseConnection: database}
+		publicKeyPointRequestRepo := &repo.PublicKeyPointRequestRepository{DatabaseConnection: database}
 
-	tourRepo := &repo.TourRepository{DatabaseConnection: database}
-	tourService := &service.TourService{TourRepo: tourRepo, KeypointRepo: keyPointRepo}
-	tourHandler := &handler.TourHandler{TourService: tourService}
 
-	facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
-	facilityService := &service.FacilityService{FacilityRepo: facilityRepo}
-	facilityHandler := &handler.FacilityHandler{FacilityService: facilityService}
+		type Server struct {
+			tour.UnimplementedEncounterServer
+			EncounterRepo         *repo.EncounterRepository
+			EncounterInstanceRepo *repo.EncounterInstanceRepository
+			TouristProgressRepo   *repo.TouristProgressRepository
+		}
 
-	equipmentRepo := &repo.EquipmentRepository{DatabaseConnection: database}
-	equipmentService := &service.EquipmentService{EquipmentRepo: equipmentRepo}
-	equipmentHandler := &handler.EquipmentHandler{EquipmentService: equipmentService}
+	*/
+	//keyPointService := &service.KeyPointService{KeyPointRepo: keyPointRepo}
+	//keyPointHandler := &handler.KeyPointHandler{KeyPointService: keyPointService}
 
-	preferenceRepo := &repo.PreferenceRepository{DatabaseConnection: database}
-	preferenceService := &service.PreferenceService{PreferenceRepo: preferenceRepo}
-	preferenceHandler := &handler.PreferenceHandler{PreferenceService: preferenceService}
+	tourRepo := repo.TourRepository{DatabaseConnection: database}
+	//tourService := &service.TourService{TourRepo: tourRepo, KeypointRepo: keyPointRepo}
+	/*
+		tourHandler := &handler.TourHandler{TourService: tourService}
 
-	publicKeyPointRequestRepo := &repo.PublicKeyPointRequestRepository{DatabaseConnection: database}
-	publicKeyPointRequestService := &service.PublicKeyPointRequestService{PublicKeyPointRequestRepo: publicKeyPointRequestRepo, KeypointRepo: keyPointRepo}
-	publicKeyPointRequestHandler := &handler.PublicKeyPointRequestHandler{PublicKeyPointRequestService: publicKeyPointRequestService}
+		facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
+		facilityService := &service.FacilityService{FacilityRepo: facilityRepo}
+		facilityHandler := &handler.FacilityHandler{FacilityService: facilityService}
 
-	publicFacilityRequestRepo := &repo.PublicFacilityRequestRepository{DatabaseConnection: database}
-	publicFacilityRequestService := &service.PublicFacilityRequestService{PublicFacilityRequestRepo: publicFacilityRequestRepo, FacilityRepo: facilityRepo}
-	publicFacilityRequestHandler := &handler.PublicFacilityRequestHandler{PublicFacilityRequestService: publicFacilityRequestService}
+		equipmentRepo := &repo.EquipmentRepository{DatabaseConnection: database}
+		equipmentService := &service.EquipmentService{EquipmentRepo: equipmentRepo}
+		equipmentHandler := &handler.EquipmentHandler{EquipmentService: equipmentService}
 
-	startTourServer(tourHandler, keyPointHandler, facilityHandler, equipmentHandler, preferenceHandler, publicKeyPointRequestHandler, publicFacilityRequestHandler)
+		preferenceRepo := &repo.PreferenceRepository{DatabaseConnection: database}
+		preferenceService := &service.PreferenceService{PreferenceRepo: preferenceRepo}
+		preferenceHandler := &handler.PreferenceHandler{PreferenceService: preferenceService}
 
+		publicKeyPointRequestRepo := &repo.PublicKeyPointRequestRepository{DatabaseConnection: database}
+		publicKeyPointRequestService := &service.PublicKeyPointRequestService{PublicKeyPointRequestRepo: publicKeyPointRequestRepo, KeypointRepo: keyPointRepo}
+		publicKeyPointRequestHandler := &handler.PublicKeyPointRequestHandler{PublicKeyPointRequestService: publicKeyPointRequestService}
+
+		publicFacilityRequestRepo := &repo.PublicFacilityRequestRepository{DatabaseConnection: database}
+		publicFacilityRequestService := &service.PublicFacilityRequestService{PublicFacilityRequestRepo: publicFacilityRequestRepo, FacilityRepo: facilityRepo}
+		publicFacilityRequestHandler := &handler.PublicFacilityRequestHandler{PublicFacilityRequestService: publicFacilityRequestService}
+	*/
+	//	startTourServer(tourHandler, keyPointHandler, facilityHandler, equipmentHandler, preferenceHandler, publicKeyPointRequestHandler, publicFacilityRequestHandler)
+
+	lis, err := net.Listen("tcp", "localhost:88")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	var opts []grpc.ServerOption
+	grpcServer := grpc.NewServer(opts...)
+
+	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo})
+	reflection.Register(grpcServer)
+	grpcServer.Serve(lis)
+
+}
+
+type Server struct {
+	tour.UnimplementedTourServiceServer
+	TourRepo     *repo.TourRepository
+	KeyPointRepo *repo.KeyPointRepository
+}
+
+func (s Server) Create(ctx context.Context, request *tour.TourCreateDto) (*tour.TourResponseDto, error) {
+	t := model.Tour{
+		AuthorId: request.AuthorId, Name: request.Name, Description: request.Description, Difficulty: int(request.Difficulty),
+		Tags: request.Tags, Status: model.TourStatus(request.Status), Price: request.Price, IsDeleted: request.IsDeleted,
+		Distance: request.Distance, Category: model.TourCategory(request.Category),
+	}
+
+	tourService := service.TourService{TourRepo: s.TourRepo, KeypointRepo: s.KeyPointRepo}
+	err := tourService.Create(&t)
+	if err != nil {
+		println("Error while creating a new tour")
+		return nil, nil
+	}
+
+	println(t.Name)
+	return &tour.TourResponseDto{
+		Id: 0, AuthorId: &request.AuthorId, Name: request.Name, Description: request.Description, Difficulty: request.Difficulty,
+		Tags: request.Tags, Status: tour.TourResponseDto_TourStatus(request.Status), Price: request.Price, IsDeleted: request.IsDeleted,
+		Distance: request.Distance, Category: tour.TourResponseDto_TourCategory(request.Category),
+	}, nil
+}
+
+func (s Server) GetAuthorsTours(ctx context.Context, request *tour.GetParams) (*tour.TourListResponse, error) {
+
+	tourService := service.TourService{TourRepo: s.TourRepo, KeypointRepo: s.KeyPointRepo}
+	authorId, err := strconv.ParseInt(request.Id, 10, 64)
+	if err != nil {
+		return nil, nil
+	}
+	tours, err := tourService.GetByAuthorId(authorId)
+	if err != nil {
+		println("Error while getting")
+		return nil, nil
+	}
+
+	println(request.Id)
+
+	tourResponses := []*tour.TourResponseDto{}
+	for i := 0; i < len(tours); i++ {
+		tourResponses = append(tourResponses,
+			&tour.TourResponseDto{
+				Id: tours[i].Id, AuthorId: &tours[i].AuthorId, Name: tours[i].Name, Description: tours[i].Description, Difficulty: int32(tours[i].Difficulty),
+				Tags: tours[i].Tags, Status: tour.TourResponseDto_TourStatus(tours[i].Status), Price: tours[i].Price, IsDeleted: tours[i].IsDeleted,
+				Distance: tours[i].Distance, Category: tour.TourResponseDto_TourCategory(tours[i].Category),
+			},
+		)
+	}
+
+	return &tour.TourListResponse{
+		TourResponses: tourResponses,
+	}, nil
 }
