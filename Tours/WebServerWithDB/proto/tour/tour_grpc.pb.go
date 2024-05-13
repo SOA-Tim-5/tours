@@ -25,7 +25,7 @@ type TourServiceClient interface {
 	Create(ctx context.Context, in *TourCreateDto, opts ...grpc.CallOption) (*TourResponseDto, error)
 	GetAuthorsTours(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*TourListResponse, error)
 	CreateKeyPoint(ctx context.Context, in *KeyPointCreateDto, opts ...grpc.CallOption) (*KeyPointResponseDto, error)
-	GetById(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*TourListResponse, error)
+	GetById(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*TourResponseDto, error)
 }
 
 type tourServiceClient struct {
@@ -63,8 +63,8 @@ func (c *tourServiceClient) CreateKeyPoint(ctx context.Context, in *KeyPointCrea
 	return out, nil
 }
 
-func (c *tourServiceClient) GetById(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*TourListResponse, error) {
-	out := new(TourListResponse)
+func (c *tourServiceClient) GetById(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*TourResponseDto, error) {
+	out := new(TourResponseDto)
 	err := c.cc.Invoke(ctx, "/TourService/GetById", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ type TourServiceServer interface {
 	Create(context.Context, *TourCreateDto) (*TourResponseDto, error)
 	GetAuthorsTours(context.Context, *GetParams) (*TourListResponse, error)
 	CreateKeyPoint(context.Context, *KeyPointCreateDto) (*KeyPointResponseDto, error)
-	GetById(context.Context, *GetParams) (*TourListResponse, error)
+	GetById(context.Context, *GetParams) (*TourResponseDto, error)
 	mustEmbedUnimplementedTourServiceServer()
 }
 
@@ -96,7 +96,7 @@ func (UnimplementedTourServiceServer) GetAuthorsTours(context.Context, *GetParam
 func (UnimplementedTourServiceServer) CreateKeyPoint(context.Context, *KeyPointCreateDto) (*KeyPointResponseDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateKeyPoint not implemented")
 }
-func (UnimplementedTourServiceServer) GetById(context.Context, *GetParams) (*TourListResponse, error) {
+func (UnimplementedTourServiceServer) GetById(context.Context, *GetParams) (*TourResponseDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
 }
 func (UnimplementedTourServiceServer) mustEmbedUnimplementedTourServiceServer() {}
