@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FacilityServiceClient interface {
 	Create(ctx context.Context, in *FacilityCreateDto, opts ...grpc.CallOption) (*FacilityResponseDto, error)
-	GetByAuthorId(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*FacilityListResponse, error)
+	GetByAuthorId(ctx context.Context, in *GetFacilityParams, opts ...grpc.CallOption) (*FacilityListResponse, error)
 }
 
 type facilityServiceClient struct {
@@ -43,7 +43,7 @@ func (c *facilityServiceClient) Create(ctx context.Context, in *FacilityCreateDt
 	return out, nil
 }
 
-func (c *facilityServiceClient) GetByAuthorId(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*FacilityListResponse, error) {
+func (c *facilityServiceClient) GetByAuthorId(ctx context.Context, in *GetFacilityParams, opts ...grpc.CallOption) (*FacilityListResponse, error) {
 	out := new(FacilityListResponse)
 	err := c.cc.Invoke(ctx, "/FacilityService/GetByAuthorId", in, out, opts...)
 	if err != nil {
@@ -57,7 +57,7 @@ func (c *facilityServiceClient) GetByAuthorId(ctx context.Context, in *GetParams
 // for forward compatibility
 type FacilityServiceServer interface {
 	Create(context.Context, *FacilityCreateDto) (*FacilityResponseDto, error)
-	GetByAuthorId(context.Context, *GetParams) (*FacilityListResponse, error)
+	GetByAuthorId(context.Context, *GetFacilityParams) (*FacilityListResponse, error)
 	mustEmbedUnimplementedFacilityServiceServer()
 }
 
@@ -68,7 +68,7 @@ type UnimplementedFacilityServiceServer struct {
 func (UnimplementedFacilityServiceServer) Create(context.Context, *FacilityCreateDto) (*FacilityResponseDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedFacilityServiceServer) GetByAuthorId(context.Context, *GetParams) (*FacilityListResponse, error) {
+func (UnimplementedFacilityServiceServer) GetByAuthorId(context.Context, *GetFacilityParams) (*FacilityListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByAuthorId not implemented")
 }
 func (UnimplementedFacilityServiceServer) mustEmbedUnimplementedFacilityServiceServer() {}
@@ -103,7 +103,7 @@ func _FacilityService_Create_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _FacilityService_GetByAuthorId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetParams)
+	in := new(GetFacilityParams)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func _FacilityService_GetByAuthorId_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/FacilityService/GetByAuthorId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FacilityServiceServer).GetByAuthorId(ctx, req.(*GetParams))
+		return srv.(FacilityServiceServer).GetByAuthorId(ctx, req.(*GetFacilityParams))
 	}
 	return interceptor(ctx, in, info, handler)
 }

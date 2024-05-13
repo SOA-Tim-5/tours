@@ -4,7 +4,7 @@ option go_package = "proto/facility";
 
 service FacilityService {
     rpc Create(FacilityCreateDto) returns (FacilityResponseDto) {}
-     rpc GetByAuthorId(GetParams) returns (FacilityListResponse){}
+     rpc GetByAuthorId(GetFacilityParams) returns (FacilityListResponse){}
 }
 
 message FacilityCreateDto{
@@ -52,6 +52,6 @@ message FacilityListResponse{
     repeated FacilityResponseDto facilityResponses =1;
 }
 
-message GetParams{
+message GetFacilityParams{
     string id=1;
 }
