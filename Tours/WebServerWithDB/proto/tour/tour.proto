@@ -5,7 +5,7 @@ option go_package = "proto/tour";
 service TourService {
     rpc Create(TourCreateDto) returns (TourResponseDto) {}
      rpc GetAuthorsTours(GetParams) returns (TourListResponse){}
-     rpc GetById(GetParams) returns (TourListResponse){}
+     rpc GetById(GetParams) returns (TourResponseDto){}
 }
 
 message TourCreateDto{
