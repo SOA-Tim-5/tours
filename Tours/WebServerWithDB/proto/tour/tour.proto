@@ -7,6 +7,7 @@ service TourService {
     rpc GetAuthorsTours(GetParams) returns (TourListResponse){}
     rpc CreateKeyPoint(KeyPointCreateDto) returns (KeyPointResponseDto) {}
     rpc GetById(GetParams) returns (TourResponseDto){}
+     rpc GetAuthorsTours(GetParams) returns (TourListResponse){}
 }
 
 message TourCreateDto{
