@@ -2,8 +2,12 @@ syntax = "proto3";
 
 option go_package = "proto/publicFacilityRequest";
 
+import "google/protobuf/empty.proto";
+
+
 service PublicFacilityRequestService {
     rpc Create(PublicFacilityRequestCreateDto) returns (PublicFacilityRequestResponseDto) {}
+    rpc GetAllFacilityRequest(google.protobuf.Empty) returns (PublicFacilityRequestListResponse) {}
 }
 
 message PublicFacilityRequestCreateDto{
