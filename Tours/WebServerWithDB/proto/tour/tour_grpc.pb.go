@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type TourServiceClient interface {
 	Create(ctx context.Context, in *TourCreateDto, opts ...grpc.CallOption) (*TourResponseDto, error)
 	GetAuthorsTours(ctx context.Context, in *GetParams, opts ...grpc.CallOption) (*TourListResponse, error)
+	CreateKeyPoint(ctx context.Context, in *KeyPointCreateDto, opts ...grpc.CallOption) (*KeyPointResponseDto, error)
 }
 
 type tourServiceClient struct {
@@ -52,12 +53,22 @@ func (c *tourServiceClient) GetAuthorsTours(ctx context.Context, in *GetParams, 
 	return out, nil
 }
 
+func (c *tourServiceClient) CreateKeyPoint(ctx context.Context, in *KeyPointCreateDto, opts ...grpc.CallOption) (*KeyPointResponseDto, error) {
+	out := new(KeyPointResponseDto)
+	err := c.cc.Invoke(ctx, "/TourService/CreateKeyPoint", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TourServiceServer is the server API for TourService service.
 // All implementations must embed UnimplementedTourServiceServer
 // for forward compatibility
 type TourServiceServer interface {
 	Create(context.Context, *TourCreateDto) (*TourResponseDto, error)
 	GetAuthorsTours(context.Context, *GetParams) (*TourListResponse, error)
+	CreateKeyPoint(context.Context, *KeyPointCreateDto) (*KeyPointResponseDto, error)
 	mustEmbedUnimplementedTourServiceServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedTourServiceServer) Create(context.Context, *TourCreateDto) (*
 }
 func (UnimplementedTourServiceServer) GetAuthorsTours(context.Context, *GetParams) (*TourListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAuthorsTours not implemented")
+}
+func (UnimplementedTourServiceServer) CreateKeyPoint(context.Context, *KeyPointCreateDto) (*KeyPointResponseDto, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateKeyPoint not implemented")
 }
 func (UnimplementedTourServiceServer) mustEmbedUnimplementedTourServiceServer() {}
 
@@ -120,6 +134,24 @@ func _TourService_GetAuthorsTours_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TourService_CreateKeyPoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KeyPointCreateDto)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).CreateKeyPoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TourService/CreateKeyPoint",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).CreateKeyPoint(ctx, req.(*KeyPointCreateDto))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TourService_ServiceDesc is the grpc.ServiceDesc for TourService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var TourService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAuthorsTours",
 			Handler:    _TourService_GetAuthorsTours_Handler,
+		},
+		{
+			MethodName: "CreateKeyPoint",
+			Handler:    _TourService_CreateKeyPoint_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

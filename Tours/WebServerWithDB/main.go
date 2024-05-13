@@ -198,3 +198,26 @@ func (s Server) GetAuthorsTours(ctx context.Context, request *tour.GetParams) (*
 		TourResponses: tourResponses,
 	}, nil
 }
+
+func (s Server) CreateKeyPoint(ctx context.Context, request *tour.KeyPointCreateDto) (*tour.KeyPointResponseDto, error) {
+
+	keyPointService := &service.KeyPointService{s.KeyPointRepo}
+	tourId, err := strconv.ParseInt(request.TourId, 10, 64)
+	if err != nil {
+		return nil, nil
+	}
+	keyPoint := model.KeyPoint{
+		TourId: tourId, Name: request.Name, Description: request.Description, Longitude: request.Longitude,
+		Latitude: request.Latitude, LocationAddress: request.LocationAddress, ImagePath: request.ImagePath,
+		Order: request.Order, IsEncounterRequired: request.IsEncounterRequired, HasEncounter: request.HasEncounter,
+	}
+	err = keyPointService.Create(&keyPoint)
+
+	println(request.TourId)
+
+	return &tour.KeyPointResponseDto{
+		TourId: tourId, Name: request.Name, Description: request.Description, Longitude: request.Longitude,
+		Latitude: request.Latitude, LocationAddress: request.LocationAddress, ImagePath: request.ImagePath,
+		Order: request.Order,
+	}, nil
+}
