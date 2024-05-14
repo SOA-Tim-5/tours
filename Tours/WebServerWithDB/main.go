@@ -4,6 +4,7 @@ import (
 	"context"
 	"database-example/handler"
 	"database-example/model"
+	"database-example/proto/facility"
 	"database-example/proto/tour"
 	"database-example/repo"
 	"database-example/service"
@@ -79,6 +80,7 @@ func main() {
 	}
 
 	keyPointRepo := repo.KeyPointRepository{DatabaseConnection: database}
+	facilityRepo := repo.FacilityRepository{DatabaseConnection: database}
 	/*
 		tourRepo := &repo.TourRepository{DatabaseConnection: database}
 		facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
@@ -134,7 +136,8 @@ func main() {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 
-	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo})
+	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo, FacilityRepo: &facilityRepo})
+	facility.RegisterFacilityServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo, FacilityRepo: &facilityRepo})
 	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
 
@@ -142,8 +145,10 @@ func main() {
 
 type Server struct {
 	tour.UnimplementedTourServiceServer
+	facility.UnimplementedFacilityServiceServer
 	TourRepo     *repo.TourRepository
 	KeyPointRepo *repo.KeyPointRepository
+	FacilityRepo *repo.FacilityRepository
 }
 
 func (s Server) Create(ctx context.Context, request *tour.TourCreateDto) (*tour.TourResponseDto, error) {
@@ -241,5 +246,24 @@ func (s Server) GetById(ctx context.Context, request *tour.GetParams) (*tour.Tou
 		Id: t.Id, AuthorId: &t.AuthorId, Name: t.Name, Description: t.Description, Difficulty: int32(t.Difficulty),
 		Tags: t.Tags, Status: tour.TourResponseDto_TourStatus(t.Status), Price: t.Price, IsDeleted: t.IsDeleted,
 		Distance: t.Distance, Category: tour.TourResponseDto_TourCategory(t.Category),
+	}, nil
+}
+func (s Server) CreateFacility(ctx context.Context, request *facility.FacilityCreateDto) (*facility.FacilityResponseDto, error) {
+	t := model.Facility{
+		Name: request.Name, Description: request.Description, ImagePath: request.ImagePath, AuthorId: int(request.AuthorId), Category: model.FacilityCategory(request.Category),
+		Longitude: request.Longitude, Latitude: request.Latitude,
+	}
+
+	facilityService := service.FacilityService{FacilityRepo: s.FacilityRepo}
+	err := facilityService.FacilityRepo.CreateFacility(&t)
+	if err != nil {
+		println("Error while creating a new tour")
+		return nil, nil
+	}
+
+	println(t.Name)
+	return &facility.FacilityResponseDto{
+		Id: 0, Name: request.Name, Description: request.Description, ImagePath: request.ImagePath, AuthorId: int64(request.AuthorId), Category: facility.FacilityResponseDto_FacilityCategory(request.Category),
+		Longitude: request.Longitude, Latitude: request.Latitude,
 	}, nil
 }
