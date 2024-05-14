@@ -3,8 +3,8 @@ syntax = "proto3";
 option go_package = "proto/facility";
 
 service FacilityService {
-    rpc Create(FacilityCreateDto) returns (FacilityResponseDto) {}
-     rpc GetByAuthorId(GetFacilityParams) returns (FacilityListResponse){}
+    rpc CreateFacility(FacilityCreateDto) returns (FacilityResponseDto) {}
+     
 }
 
 message FacilityCreateDto{

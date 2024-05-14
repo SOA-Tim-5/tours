@@ -5,6 +5,7 @@ import (
 	"database-example/handler"
 	"database-example/model"
 	"database-example/proto/equipment"
+	"database-example/proto/facility"
 	"database-example/proto/preference"
 	"database-example/proto/tour"
 	"database-example/repo"
@@ -16,6 +17,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/driver/postgres"
 
 	"github.com/gorilla/mux"
@@ -81,6 +83,7 @@ func main() {
 	}
 
 	keyPointRepo := repo.KeyPointRepository{DatabaseConnection: database}
+	facilityRepo := repo.FacilityRepository{DatabaseConnection: database}
 	/*
 		tourRepo := &repo.TourRepository{DatabaseConnection: database}
 		facilityRepo := &repo.FacilityRepository{DatabaseConnection: database}
@@ -139,8 +142,10 @@ func main() {
 	grpcServer := grpc.NewServer(opts...)
 
 	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo})
+	facility.RegisterFacilityServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo, FacilityRepo: &facilityRepo})
 	preference.RegisterPreferenceServiceServer(grpcServer, Server{PreferenceRepo: &preferenceRepo})
 	equipment.RegisterEquipmentServiceServer(grpcServer, Server{EquipmentRepo: &equipmentRepo})
+
 	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
 
@@ -148,13 +153,14 @@ func main() {
 
 type Server struct {
 	tour.UnimplementedTourServiceServer
+	facility.UnimplementedFacilityServiceServer
 	preference.UnimplementedPreferenceServiceServer
 	equipment.UnimplementedEquipmentServiceServer
-	TourRepo                  *repo.TourRepository
-	KeyPointRepo              *repo.KeyPointRepository
-	PublicFacilityRequestRepo *repo.PublicFacilityRequestRepository
-	EquipmentRepo             *repo.EquipmentRepository
-	PreferenceRepo            *repo.PreferenceRepository
+	TourRepo       *repo.TourRepository
+	KeyPointRepo   *repo.KeyPointRepository
+	FacilityRepo   *repo.FacilityRepository
+	EquipmentRepo  *repo.EquipmentRepository
+	PreferenceRepo *repo.PreferenceRepository
 }
 
 func (s Server) Create(ctx context.Context, request *tour.TourCreateDto) (*tour.TourResponseDto, error) {
@@ -254,6 +260,27 @@ func (s Server) GetById(ctx context.Context, request *tour.GetParams) (*tour.Tou
 		Distance: t.Distance, Category: tour.TourResponseDto_TourCategory(t.Category),
 	}, nil
 }
+
+func (s Server) CreateFacility(ctx context.Context, request *facility.FacilityCreateDto) (*facility.FacilityResponseDto, error) {
+	t := model.Facility{
+		Name: request.Name, Description: request.Description, ImagePath: request.ImagePath, AuthorId: int(request.AuthorId), Category: model.FacilityCategory(request.Category),
+		Longitude: request.Longitude, Latitude: request.Latitude,
+	}
+
+	facilityService := service.FacilityService{FacilityRepo: s.FacilityRepo}
+	err := facilityService.FacilityRepo.CreateFacility(&t)
+	if err != nil {
+		println("Error while creating a new tour")
+		return nil, nil
+	}
+
+	println(t.Name)
+	return &facility.FacilityResponseDto{
+		Id: 0, Name: request.Name, Description: request.Description, ImagePath: request.ImagePath, AuthorId: int64(request.AuthorId), Category: facility.FacilityResponseDto_FacilityCategory(request.Category),
+		Longitude: request.Longitude, Latitude: request.Latitude,
+	}, nil
+}
+
 func (s Server) CreatePreference(ctx context.Context, request *preference.PreferenceCreateDto) (*preference.PreferenceResponseDto, error) {
 	t := model.Preference{
 		UserId: request.UserId, DifficultyLevel: int(request.DifficultyLevel), CarRating: int(request.CarRating), CyclingRating: int(request.CyclingRating), BoatRating: int(request.BoatRating), WalkingRating: int(request.WalkingRating), SelectedTags: request.SelectedTags,
@@ -306,7 +333,7 @@ func (s Server) CreateEquipment(ctx context.Context, request *equipment.Equipmen
 	}, nil
 }
 
-func (s Server) GetAll(ctx context.Context) (*equipment.EquipmentListResponse, error) {
+func (s Server) GetAll(ctx context.Context, empty *emptypb.Empty) (*equipment.EquipmentListResponse, error) {
 
 	equipmentService := service.EquipmentService{EquipmentRepo: s.EquipmentRepo}
 
