@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package = "proto/preference";
 
 service PreferenceService {
-    rpc Create(PreferenceCreateDto) returns (PreferenceResponseDto) {}
+    rpc CreatePreference(PreferenceCreateDto) returns (PreferenceResponseDto) {}
     rpc GetByTouristId(GetPreferenceParams) returns (PreferenceResponseDto) {}
 }
 

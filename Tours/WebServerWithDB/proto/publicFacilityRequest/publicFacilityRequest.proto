@@ -6,7 +6,7 @@ import "google/protobuf/empty.proto";
 
 
 service PublicFacilityRequestService {
-    rpc Create(PublicFacilityRequestCreateDto) returns (PublicFacilityRequestResponseDto) {}
+    rpc CreateFacilityRequest(PublicFacilityRequestCreateDto) returns (PublicFacilityRequestResponseDto) {}
     rpc GetAllFacilityRequest(google.protobuf.Empty) returns (PublicFacilityRequestListResponse) {}
 }
 

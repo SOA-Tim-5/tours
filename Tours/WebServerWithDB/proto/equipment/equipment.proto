@@ -4,7 +4,7 @@ option go_package = "proto/equipment";
 import "google/protobuf/empty.proto";
 
 service EquipmentService {
-    rpc Create(EquipmentCreateDto) returns (EquipmentResponseDto) {}
+    rpc CreateEquipment(EquipmentCreateDto) returns (EquipmentResponseDto) {}
     rpc GetAll(google.protobuf.Empty) returns (EquipmentListResponse) {}
 }
 

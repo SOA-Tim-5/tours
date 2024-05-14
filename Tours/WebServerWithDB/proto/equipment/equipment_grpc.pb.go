@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EquipmentServiceClient interface {
-	Create(ctx context.Context, in *EquipmentCreateDto, opts ...grpc.CallOption) (*EquipmentResponseDto, error)
+	CreateEquipment(ctx context.Context, in *EquipmentCreateDto, opts ...grpc.CallOption) (*EquipmentResponseDto, error)
 	GetAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EquipmentListResponse, error)
 }
 
@@ -35,9 +35,9 @@ func NewEquipmentServiceClient(cc grpc.ClientConnInterface) EquipmentServiceClie
 	return &equipmentServiceClient{cc}
 }
 
-func (c *equipmentServiceClient) Create(ctx context.Context, in *EquipmentCreateDto, opts ...grpc.CallOption) (*EquipmentResponseDto, error) {
+func (c *equipmentServiceClient) CreateEquipment(ctx context.Context, in *EquipmentCreateDto, opts ...grpc.CallOption) (*EquipmentResponseDto, error) {
 	out := new(EquipmentResponseDto)
-	err := c.cc.Invoke(ctx, "/EquipmentService/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/EquipmentService/CreateEquipment", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *equipmentServiceClient) GetAll(ctx context.Context, in *emptypb.Empty, 
 // All implementations must embed UnimplementedEquipmentServiceServer
 // for forward compatibility
 type EquipmentServiceServer interface {
-	Create(context.Context, *EquipmentCreateDto) (*EquipmentResponseDto, error)
+	CreateEquipment(context.Context, *EquipmentCreateDto) (*EquipmentResponseDto, error)
 	GetAll(context.Context, *emptypb.Empty) (*EquipmentListResponse, error)
 	mustEmbedUnimplementedEquipmentServiceServer()
 }
@@ -66,8 +66,8 @@ type EquipmentServiceServer interface {
 type UnimplementedEquipmentServiceServer struct {
 }
 
-func (UnimplementedEquipmentServiceServer) Create(context.Context, *EquipmentCreateDto) (*EquipmentResponseDto, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedEquipmentServiceServer) CreateEquipment(context.Context, *EquipmentCreateDto) (*EquipmentResponseDto, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateEquipment not implemented")
 }
 func (UnimplementedEquipmentServiceServer) GetAll(context.Context, *emptypb.Empty) (*EquipmentListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
@@ -85,20 +85,20 @@ func RegisterEquipmentServiceServer(s grpc.ServiceRegistrar, srv EquipmentServic
 	s.RegisterService(&EquipmentService_ServiceDesc, srv)
 }
 
-func _EquipmentService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EquipmentService_CreateEquipment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EquipmentCreateDto)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EquipmentServiceServer).Create(ctx, in)
+		return srv.(EquipmentServiceServer).CreateEquipment(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/EquipmentService/Create",
+		FullMethod: "/EquipmentService/CreateEquipment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EquipmentServiceServer).Create(ctx, req.(*EquipmentCreateDto))
+		return srv.(EquipmentServiceServer).CreateEquipment(ctx, req.(*EquipmentCreateDto))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -129,8 +129,8 @@ var EquipmentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*EquipmentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _EquipmentService_Create_Handler,
+			MethodName: "CreateEquipment",
+			Handler:    _EquipmentService_CreateEquipment_Handler,
 		},
 		{
 			MethodName: "GetAll",

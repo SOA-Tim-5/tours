@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PreferenceServiceClient interface {
-	Create(ctx context.Context, in *PreferenceCreateDto, opts ...grpc.CallOption) (*PreferenceResponseDto, error)
+	CreatePreference(ctx context.Context, in *PreferenceCreateDto, opts ...grpc.CallOption) (*PreferenceResponseDto, error)
 	GetByTouristId(ctx context.Context, in *GetPreferenceParams, opts ...grpc.CallOption) (*PreferenceResponseDto, error)
 }
 
@@ -34,9 +34,9 @@ func NewPreferenceServiceClient(cc grpc.ClientConnInterface) PreferenceServiceCl
 	return &preferenceServiceClient{cc}
 }
 
-func (c *preferenceServiceClient) Create(ctx context.Context, in *PreferenceCreateDto, opts ...grpc.CallOption) (*PreferenceResponseDto, error) {
+func (c *preferenceServiceClient) CreatePreference(ctx context.Context, in *PreferenceCreateDto, opts ...grpc.CallOption) (*PreferenceResponseDto, error) {
 	out := new(PreferenceResponseDto)
-	err := c.cc.Invoke(ctx, "/PreferenceService/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/PreferenceService/CreatePreference", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *preferenceServiceClient) GetByTouristId(ctx context.Context, in *GetPre
 // All implementations must embed UnimplementedPreferenceServiceServer
 // for forward compatibility
 type PreferenceServiceServer interface {
-	Create(context.Context, *PreferenceCreateDto) (*PreferenceResponseDto, error)
+	CreatePreference(context.Context, *PreferenceCreateDto) (*PreferenceResponseDto, error)
 	GetByTouristId(context.Context, *GetPreferenceParams) (*PreferenceResponseDto, error)
 	mustEmbedUnimplementedPreferenceServiceServer()
 }
@@ -65,8 +65,8 @@ type PreferenceServiceServer interface {
 type UnimplementedPreferenceServiceServer struct {
 }
 
-func (UnimplementedPreferenceServiceServer) Create(context.Context, *PreferenceCreateDto) (*PreferenceResponseDto, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedPreferenceServiceServer) CreatePreference(context.Context, *PreferenceCreateDto) (*PreferenceResponseDto, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePreference not implemented")
 }
 func (UnimplementedPreferenceServiceServer) GetByTouristId(context.Context, *GetPreferenceParams) (*PreferenceResponseDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByTouristId not implemented")
@@ -84,20 +84,20 @@ func RegisterPreferenceServiceServer(s grpc.ServiceRegistrar, srv PreferenceServ
 	s.RegisterService(&PreferenceService_ServiceDesc, srv)
 }
 
-func _PreferenceService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PreferenceService_CreatePreference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PreferenceCreateDto)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PreferenceServiceServer).Create(ctx, in)
+		return srv.(PreferenceServiceServer).CreatePreference(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/PreferenceService/Create",
+		FullMethod: "/PreferenceService/CreatePreference",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PreferenceServiceServer).Create(ctx, req.(*PreferenceCreateDto))
+		return srv.(PreferenceServiceServer).CreatePreference(ctx, req.(*PreferenceCreateDto))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,8 +128,8 @@ var PreferenceService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PreferenceServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _PreferenceService_Create_Handler,
+			MethodName: "CreatePreference",
+			Handler:    _PreferenceService_CreatePreference_Handler,
 		},
 		{
 			MethodName: "GetByTouristId",

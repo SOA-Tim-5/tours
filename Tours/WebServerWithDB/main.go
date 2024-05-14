@@ -4,6 +4,8 @@ import (
 	"context"
 	"database-example/handler"
 	"database-example/model"
+	"database-example/proto/equipment"
+	"database-example/proto/preference"
 	"database-example/proto/tour"
 	"database-example/repo"
 	"database-example/service"
@@ -100,6 +102,8 @@ func main() {
 	//keyPointHandler := &handler.KeyPointHandler{KeyPointService: keyPointService}
 
 	tourRepo := repo.TourRepository{DatabaseConnection: database}
+	preferenceRepo := repo.PreferenceRepository{DatabaseConnection: database}
+	equipmentRepo := repo.EquipmentRepository{DatabaseConnection: database}
 	//tourService := &service.TourService{TourRepo: tourRepo, KeypointRepo: keyPointRepo}
 	/*
 		tourHandler := &handler.TourHandler{TourService: tourService}
@@ -135,6 +139,8 @@ func main() {
 	grpcServer := grpc.NewServer(opts...)
 
 	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo})
+	preference.RegisterPreferenceServiceServer(grpcServer, Server{PreferenceRepo: &preferenceRepo})
+	equipment.RegisterEquipmentServiceServer(grpcServer, Server{EquipmentRepo: &equipmentRepo})
 	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
 
@@ -142,8 +148,13 @@ func main() {
 
 type Server struct {
 	tour.UnimplementedTourServiceServer
-	TourRepo     *repo.TourRepository
-	KeyPointRepo *repo.KeyPointRepository
+	preference.UnimplementedPreferenceServiceServer
+	equipment.UnimplementedEquipmentServiceServer
+	TourRepo                  *repo.TourRepository
+	KeyPointRepo              *repo.KeyPointRepository
+	PublicFacilityRequestRepo *repo.PublicFacilityRequestRepository
+	EquipmentRepo             *repo.EquipmentRepository
+	PreferenceRepo            *repo.PreferenceRepository
 }
 
 func (s Server) Create(ctx context.Context, request *tour.TourCreateDto) (*tour.TourResponseDto, error) {
@@ -241,5 +252,82 @@ func (s Server) GetById(ctx context.Context, request *tour.GetParams) (*tour.Tou
 		Id: t.Id, AuthorId: &t.AuthorId, Name: t.Name, Description: t.Description, Difficulty: int32(t.Difficulty),
 		Tags: t.Tags, Status: tour.TourResponseDto_TourStatus(t.Status), Price: t.Price, IsDeleted: t.IsDeleted,
 		Distance: t.Distance, Category: tour.TourResponseDto_TourCategory(t.Category),
+	}, nil
+}
+func (s Server) CreatePreference(ctx context.Context, request *preference.PreferenceCreateDto) (*preference.PreferenceResponseDto, error) {
+	t := model.Preference{
+		UserId: request.UserId, DifficultyLevel: int(request.DifficultyLevel), CarRating: int(request.CarRating), CyclingRating: int(request.CyclingRating), BoatRating: int(request.BoatRating), WalkingRating: int(request.WalkingRating), SelectedTags: request.SelectedTags,
+	}
+
+	preferenceService := service.PreferenceService{PreferenceRepo: s.PreferenceRepo}
+	err := preferenceService.Create(&t)
+	if err != nil {
+		println("Error while creating a new tour")
+		return nil, nil
+	}
+
+	return &preference.PreferenceResponseDto{
+		Id: 0, UserId: request.UserId, DifficultyLevel: int32(request.DifficultyLevel), CarRating: int32(request.CarRating), CyclingRating: int32(request.CyclingRating), BoatRating: int32(request.BoatRating), WalkingRating: int32(request.WalkingRating), SelectedTags: request.SelectedTags,
+	}, nil
+}
+func (s Server) GetByTouristId(ctx context.Context, request *preference.GetPreferenceParams) (*preference.PreferenceResponseDto, error) {
+
+	preferenceService := service.PreferenceService{PreferenceRepo: s.PreferenceRepo}
+	id, err := strconv.ParseInt(request.Id, 10, 64)
+	if err != nil {
+		return nil, nil
+	}
+	t, err := preferenceService.GetByTouristId(id)
+	if err != nil {
+		println("Error while getting")
+		return nil, nil
+	}
+
+	println(t.Id)
+
+	return &preference.PreferenceResponseDto{
+		Id: 0, UserId: t.UserId, CyclingRating: int32(t.CyclingRating), CarRating: int32(t.CarRating), WalkingRating: int32(t.WalkingRating), BoatRating: int32(t.BoatRating), DifficultyLevel: int32(t.DifficultyLevel), SelectedTags: t.SelectedTags,
+	}, nil
+}
+func (s Server) CreateEquipment(ctx context.Context, request *equipment.EquipmentCreateDto) (*equipment.EquipmentResponseDto, error) {
+	t := model.Equipment{
+		Name: request.Name, Description: request.Description,
+	}
+
+	equipmentService := service.EquipmentService{EquipmentRepo: s.EquipmentRepo}
+	err := equipmentService.Create(&t)
+	if err != nil {
+		println("Error while creating a new tour")
+		return nil, nil
+	}
+
+	return &equipment.EquipmentResponseDto{
+		Id: 0, Name: request.Name, Description: request.Description,
+	}, nil
+}
+
+func (s Server) GetAll(ctx context.Context) (*equipment.EquipmentListResponse, error) {
+
+	equipmentService := service.EquipmentService{EquipmentRepo: s.EquipmentRepo}
+
+	equipments, err := equipmentService.GetAll()
+	if err != nil {
+		println("Error while getting")
+		return nil, nil
+	}
+
+	//println(request.Id)
+
+	equipmentResponses := []*equipment.EquipmentResponseDto{}
+	for i := 0; i < len(equipments); i++ {
+		equipmentResponses = append(equipmentResponses,
+			&equipment.EquipmentResponseDto{
+				Id: equipments[i].Id, Name: equipments[i].Name, Description: equipments[i].Description,
+			},
+		)
+	}
+
+	return &equipment.EquipmentListResponse{
+		EquipmentResponses: equipmentResponses,
 	}, nil
 }
