@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FacilityServiceClient interface {
 	CreateFacility(ctx context.Context, in *FacilityCreateDto, opts ...grpc.CallOption) (*FacilityResponseDto, error)
+	GetByAuthorId(ctx context.Context, in *GetFacilityParams, opts ...grpc.CallOption) (*FacilityListResponse, error)
 }
 
 type facilityServiceClient struct {
@@ -42,11 +43,21 @@ func (c *facilityServiceClient) CreateFacility(ctx context.Context, in *Facility
 	return out, nil
 }
 
+func (c *facilityServiceClient) GetByAuthorId(ctx context.Context, in *GetFacilityParams, opts ...grpc.CallOption) (*FacilityListResponse, error) {
+	out := new(FacilityListResponse)
+	err := c.cc.Invoke(ctx, "/FacilityService/GetByAuthorId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FacilityServiceServer is the server API for FacilityService service.
 // All implementations must embed UnimplementedFacilityServiceServer
 // for forward compatibility
 type FacilityServiceServer interface {
 	CreateFacility(context.Context, *FacilityCreateDto) (*FacilityResponseDto, error)
+	GetByAuthorId(context.Context, *GetFacilityParams) (*FacilityListResponse, error)
 	mustEmbedUnimplementedFacilityServiceServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedFacilityServiceServer struct {
 
 func (UnimplementedFacilityServiceServer) CreateFacility(context.Context, *FacilityCreateDto) (*FacilityResponseDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFacility not implemented")
+}
+func (UnimplementedFacilityServiceServer) GetByAuthorId(context.Context, *GetFacilityParams) (*FacilityListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByAuthorId not implemented")
 }
 func (UnimplementedFacilityServiceServer) mustEmbedUnimplementedFacilityServiceServer() {}
 
@@ -88,6 +102,24 @@ func _FacilityService_CreateFacility_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FacilityService_GetByAuthorId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFacilityParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FacilityServiceServer).GetByAuthorId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/FacilityService/GetByAuthorId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FacilityServiceServer).GetByAuthorId(ctx, req.(*GetFacilityParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FacilityService_ServiceDesc is the grpc.ServiceDesc for FacilityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var FacilityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateFacility",
 			Handler:    _FacilityService_CreateFacility_Handler,
+		},
+		{
+			MethodName: "GetByAuthorId",
+			Handler:    _FacilityService_GetByAuthorId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -358,3 +358,32 @@ func (s Server) GetAll(ctx context.Context, empty *emptypb.Empty) (*equipment.Eq
 		EquipmentResponses: equipmentResponses,
 	}, nil
 }
+func (s Server) GetByAuthorId(ctx context.Context, request *facility.GetFacilityParams) (*facility.FacilityListResponse, error) {
+
+	facilityService := service.FacilityService{FacilityRepo: s.FacilityRepo}
+	authorId, err := strconv.ParseInt(request.Id, 10, 64)
+	if err != nil {
+		return nil, nil
+	}
+	facilites, err := facilityService.GetByAuthorId(authorId)
+	if err != nil {
+		println("Error while getting")
+		return nil, nil
+	}
+
+	println(request.Id)
+
+	facilitiesResponses := []*facility.FacilityResponseDto{}
+	for i := 0; i < len(facilites); i++ {
+		facilitiesResponses = append(facilitiesResponses,
+			&facility.FacilityResponseDto{
+				Id: 0, Name: facilites[i].Name, Description: facilites[i].Description, ImagePath: facilites[i].ImagePath, AuthorId: int64(facilites[i].AuthorId), Category: facility.FacilityResponseDto_FacilityCategory(facilites[i].Category),
+				Longitude: facilites[i].Longitude, Latitude: facilites[i].Latitude,
+			},
+		)
+	}
+
+	return &facility.FacilityListResponse{
+		FacilityResponses: facilitiesResponses,
+	}, nil
+}

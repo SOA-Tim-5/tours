@@ -13,7 +13,7 @@ type PublicFacilityRequest struct {
 	AuthorId      int64
 	Status        PublicStatus
 	Comment       string
-	Created       int64
+	Created       time.Time
 	AuthorName    string
 	AuthorPicture string
 }
