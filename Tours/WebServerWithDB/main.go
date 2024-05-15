@@ -101,7 +101,7 @@ func main() {
 		}
 
 	*/
-	//keyPointService := &service.KeyPointService{KeyPointRepo: keyPointRepo}
+	keyPointService := &service.KeyPointService{KeyPointRepo: &keyPointRepo}
 	//keyPointHandler := &handler.KeyPointHandler{KeyPointService: keyPointService}
 
 	tourRepo := repo.TourRepository{DatabaseConnection: database}
@@ -141,7 +141,7 @@ func main() {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 
-	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo})
+	tour.RegisterTourServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo, KeyPointService: keyPointService})
 	facility.RegisterFacilityServiceServer(grpcServer, Server{TourRepo: &tourRepo, KeyPointRepo: &keyPointRepo, FacilityRepo: &facilityRepo})
 	preference.RegisterPreferenceServiceServer(grpcServer, Server{PreferenceRepo: &preferenceRepo})
 	equipment.RegisterEquipmentServiceServer(grpcServer, Server{EquipmentRepo: &equipmentRepo})
@@ -156,11 +156,12 @@ type Server struct {
 	facility.UnimplementedFacilityServiceServer
 	preference.UnimplementedPreferenceServiceServer
 	equipment.UnimplementedEquipmentServiceServer
-	TourRepo       *repo.TourRepository
-	KeyPointRepo   *repo.KeyPointRepository
-	FacilityRepo   *repo.FacilityRepository
-	EquipmentRepo  *repo.EquipmentRepository
-	PreferenceRepo *repo.PreferenceRepository
+	TourRepo        *repo.TourRepository
+	KeyPointRepo    *repo.KeyPointRepository
+	FacilityRepo    *repo.FacilityRepository
+	EquipmentRepo   *repo.EquipmentRepository
+	PreferenceRepo  *repo.PreferenceRepository
+	KeyPointService *service.KeyPointService
 }
 
 func (s Server) Create(ctx context.Context, request *tour.TourCreateDto) (*tour.TourResponseDto, error) {
@@ -226,7 +227,7 @@ func (s Server) CreateKeyPoint(ctx context.Context, request *tour.KeyPointCreate
 	keyPoint := model.KeyPoint{
 		TourId: tourId, Name: request.Name, Description: request.Description, Longitude: request.Longitude,
 		Latitude: request.Latitude, LocationAddress: request.LocationAddress, ImagePath: request.ImagePath,
-		Order: request.Order, IsEncounterRequired: request.IsEncounterRequired, HasEncounter: request.HasEncounter,
+		Order: request.Order, IsEncounterRequired: request.IsEncounterRequired,
 	}
 	err = keyPointService.Create(&keyPoint)
 
@@ -385,5 +386,32 @@ func (s Server) GetByAuthorId(ctx context.Context, request *facility.GetFacility
 
 	return &facility.FacilityListResponse{
 		FacilityResponses: facilitiesResponses,
+	}, nil
+}
+
+func (s Server) GetKeyPoints(ctx context.Context, request *tour.GetParams) (*tour.KeyPointList, error) {
+
+	tourIdStr := request.Id
+	tourId, err := strconv.ParseInt(tourIdStr, 10, 64)
+	if err != nil {
+		print("Parse error")
+		return nil, nil
+	}
+
+	storedKeyPoints, err := s.KeyPointService.GetKeyPoints(tourId)
+	facilitiesResponses := []*tour.KeyPointResponseDto{}
+	for i := 0; i < len(storedKeyPoints); i++ {
+		facilitiesResponses = append(facilitiesResponses,
+			&tour.KeyPointResponseDto{
+				Id: storedKeyPoints[i].Id, TourId: storedKeyPoints[i].TourId, Name: storedKeyPoints[i].Name,
+				Description: storedKeyPoints[i].Description, Longitude: storedKeyPoints[i].Longitude,
+				Latitude: storedKeyPoints[i].Latitude, LocationAddress: storedKeyPoints[i].LocationAddress, ImagePath: storedKeyPoints[i].ImagePath,
+				Order: storedKeyPoints[i].Order, HaveSecret: &storedKeyPoints[i].HaveSecret,
+			},
+		)
+	}
+
+	return &tour.KeyPointList{
+		List: facilitiesResponses,
 	}, nil
 }

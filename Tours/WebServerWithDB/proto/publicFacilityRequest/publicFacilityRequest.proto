@@ -6,11 +6,11 @@ import "google/protobuf/empty.proto";
 
 
 service PublicFacilityRequestService {
-    rpc CreateFacilityRequest(PublicFacilityRequestCreateDto) returns (PublicFacilityRequestResponseDto) {}
-    rpc GetAllFacilityRequest(google.protobuf.Empty) returns (PublicFacilityRequestListResponse) {}
+    rpc CreateFacilityRequest(PublicFacilityRequestCreateDtoF) returns (PublicFacilityRequestResponseDtoF) {}
+    rpc GetAllFacilityRequest(google.protobuf.Empty) returns (PublicFacilityRequestListResponseF) {}
 }
 
-message PublicFacilityRequestCreateDto{
+message PublicFacilityRequestCreateDtoF{
     int64 Id=1;
      int64 AuthorId=2;
  int64 FacilityId=3;
@@ -27,7 +27,7 @@ message PublicFacilityRequestCreateDto{
 }
 
 
-message  PublicFacilityRequestResponseDto{
+message  PublicFacilityRequestResponseDtoF{
     int64 Id=1;
  int64 FacilityId=2;
  enum PublicStatus {
@@ -41,27 +41,27 @@ message  PublicFacilityRequestResponseDto{
  int64 Created=5;
  string AuthorName=6;
  string FacilityName=7;
- UserResponseDto Author=8;
+ UserResponseDtoF Author=8;
 }
 
-message UserResponseDto{
+message UserResponseDtoF{
      int64 Id =1;
         string Username =2;
         string ProfilePicture =3;
         int32 Role=4;
        bool IsActive=5;
-        repeated FollowerCreateDto Followers = 6;
+        repeated FollowerCreateDtoF Followers = 6;
 }
 
-message FollowerCreateDto{
+message FollowerCreateDtoF{
     int64 UserId=1;
     int64 FollowedById=2;
 }
 
-message PublicFacilityRequestListResponse{
-    repeated PublicFacilityRequestResponseDto publicFacilityRequestsResponses =1;
+message PublicFacilityRequestListResponseF{
+    repeated PublicFacilityRequestResponseDtoF publicFacilityRequestsResponses =1;
 }
 
-message GetRequestParams{
+message GetRequestParamsF{
     string id=1;
 }
